@@ -129,4 +129,5 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 protected:
 	afx_msg LRESULT OnGetfocus(WPARAM wParam, LPARAM lParam);
+	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 };

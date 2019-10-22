@@ -1674,3 +1674,23 @@ afx_msg LRESULT CEmBeddedWindowsDlg::OnGetfocus(WPARAM wParam, LPARAM lParam)
 	TRACE(_T("WM_GetFocus\n"));
 	return 0;
 }
+BOOL CEmBeddedWindowsDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	switch (message)
+	{
+	case WM_ACTIVATE:
+		if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) {
+			// full screen viewer can be minimized from other screen
+			TRACE(_T("WA_ACTIVE！\n"));
+		}
+		else if (LOWORD(wParam) == WA_INACTIVE) {
+			TRACE(_T("WA_INACTIVE！\n"));
+		}
+		//TRACE(_T("WM_ACTIVATE激活编辑框！\n"));
+		return true;
+
+	}
+
+	return CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
+}
