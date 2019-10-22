@@ -1689,7 +1689,6 @@ BOOL CEmBeddedWindowsDlg::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, L
 		}
 		//TRACE(_T("WM_ACTIVATE¼¤»î±à¼­¿ò£¡\n"));
 		return true;
-
 	}
 
 	return CDialogEx::OnWndMsg(message, wParam, lParam, pResult);
