@@ -31,7 +31,7 @@ using namespace std;
 
 
 
-#define WM_StartDisPMESSAGE        WM_USER + 1003 //增加自定义消息
+
 //
 
 struct EnumParam
@@ -120,7 +120,7 @@ CEmBeddedWindowsDlg::CEmBeddedWindowsDlg(CWnd* pParent /*=NULL*/)
 	,m_swich(0)
 	,m_notshow(false)
 	, m_UpdSentSocket(0)
-	, m_showListdlg(false)
+	, m_showListdlg(true)
 	, m_isOk2Brocast(false)
 	, m_ishost(false)
 {
@@ -246,6 +246,14 @@ void CEmBeddedWindowsDlg::CreateMultiVncProcess()
 
 		//Sleep(1000);
 		pWnd = FromHandle(temphwnd);
+		//setStyle
+
+		LONG_PTR Style = ::GetWindowLongPtr(temphwnd, GWL_STYLE);
+		//修改属性值（取消标题栏，取消系统按钮，取消边框）
+		Style = (Style | WS_MAXIMIZE) & ~(WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_MAXIMIZEBOX);
+		//设置修改后的属性值
+		::SetWindowLongPtr(temphwnd, GWL_STYLE, Style);
+		
 		::SetParent(temphwnd, this->m_hWnd);
 		ScreenToClient(rc);
 		pWnd->MoveWindow(&rc, true);
@@ -449,6 +457,12 @@ BOOL CEmBeddedWindowsDlg::OnInitDialog()
 		}
 	}
 	m_ishost = m_login.m_isHost;
+	if (m_login.m_bStealLogin)
+	{
+		::EnterCriticalSection(&m_UDPfunctionMnanage);
+		 m_state = "Offline";
+		::LeaveCriticalSection(&m_UDPfunctionMnanage);
+	}
 	m_isOk2Brocast = true;//进来之后就可以广播自己的信息了,并且接收ini消息
 	m_hudpthread = CreateThread(NULL, 0, UDPBroadcastThread, this, 0, NULL);
 	
@@ -491,7 +505,7 @@ BOOL CEmBeddedWindowsDlg::OnInitDialog()
 	
 	
 
-	//SetTimer(0, 1000, NULL);
+	SetTimer(0, 1, NULL);
 	//SetTimer(1, 100, NULL);
 	//LONG dwStyle = ::GetWindowLong(m_hWnd, GWL_STYLE);
 	//::SetWindowLong(m_hWnd, GWL_STYLE, dwStyle | WS_MINIMIZEBOX);
@@ -506,7 +520,7 @@ BOOL CEmBeddedWindowsDlg::OnInitDialog()
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
 
-	if (!appIsRunning(_T("GQYserver")))
+	if (!m_notshow&&!appIsRunning(_T("GQYserver")))
 	{
 		// Start the child process. 
 		if (!CreateProcess(_T("./GQYserver.exe"),   // No module name (use command line)
@@ -524,13 +538,15 @@ BOOL CEmBeddedWindowsDlg::OnInitDialog()
 			printf("CreateProcess failed (%d).\n", GetLastError());
 			//return;
 		}
-	}
+	}  
 	//创建窗口
 	//m_prop1dlg = new PROP1Dlg();
 	//m_prop1dlg->Create(IDD_PROP1);
 	//m_prop1dlg->ShowWindow(SW_SHOWNORMAL);
 	
-	
+	m_showListdlg = true;
+	//::ShowWindow(m_hWnd, SW_HIDE);
+	m_TreeListdlg->ShowWindow(SW_SHOWNORMAL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -642,6 +658,11 @@ LRESULT CEmBeddedWindowsDlg::OnTrayMessage(WPARAM wParam, LPARAM lParam)
 		break;
 		case WM_LBUTTONDBLCLK:
 		{
+			if (m_showListdlg)
+			{
+				m_TreeListdlg->ShowWindow(SW_SHOWNORMAL);
+				return TRUE;
+			}
 			if (!m_showWind)
 			{
 				m_showWind = true;
@@ -814,7 +835,7 @@ void CEmBeddedWindowsDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 0:
 		KillTimer(0);
-		//::ShowWindow(m_hWnd, SW_HIDE);
+		::ShowWindow(m_hWnd, SW_HIDE);
 		break;
 	case 1:
 		KillTimer(1);       //创建启动窗口类的实例
@@ -1502,18 +1523,20 @@ void CEmBeddedWindowsDlg::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL b
 void CEmBeddedWindowsDlg::Notshow()
 {
 	// TODO: 在此添加命令处理程序代码
-	::EnterCriticalSection(&m_UDPfunctionMnanage);
-	 m_state = "Offline";
-	::LeaveCriticalSection(&m_UDPfunctionMnanage);
+	
 	
 	if(!m_notshow)
 	{//关闭服务程序
+		//不可见
+		::EnterCriticalSection(&m_UDPfunctionMnanage);
+		m_state = "Offline";
+		::LeaveCriticalSection(&m_UDPfunctionMnanage);
 		KillProcess(_T("GQYserver"));
 		m_notshow = true;
 	}
 	else 
 	{
-		m_notshow = false;
+		m_notshow = false;  //可见
 		//启动vncserver 程序
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
@@ -1534,7 +1557,9 @@ void CEmBeddedWindowsDlg::Notshow()
 			NULL,           // Use parent's starting directory 
 			&si,            // Pointer to STARTUPINFO structure
 			&pi);           // Pointer to PROCESS_INFORMATION structure
-			
+		::EnterCriticalSection(&m_UDPfunctionMnanage);
+		m_state = "OnLine";
+		::LeaveCriticalSection(&m_UDPfunctionMnanage);
 	}
 }
 
@@ -1546,13 +1571,13 @@ void CEmBeddedWindowsDlg::notshowUI(CCmdUI *pCmdUI)
 	if (m_notshow)
 	{
 		
-		pCmdUI->SetText(_T("可被发现"));
+		pCmdUI->SetText(_T("可见"));
 		
 
 	}
 	else {
 		
-		pCmdUI->SetText(_T("不被发现"));
+		pCmdUI->SetText(_T("不可见"));
 		
 	}
 }

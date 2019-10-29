@@ -52,3 +52,5 @@
 #endif
 
 
+#define WM_StartDisPMESSAGE        WM_USER + 1003 //增加自定义消息
+HWND CreateVncProcess(TCHAR* cmd);

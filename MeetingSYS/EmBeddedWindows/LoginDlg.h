@@ -35,4 +35,6 @@ public:
 	bool m_destroywindow;
 	//CStatic m_picture;
 	virtual BOOL OnInitDialog();
+	bool m_bStealLogin;
+	afx_msg void OnBnClickedButton3();
 };

@@ -88,16 +88,16 @@ BOOL TreeListDlg::OnInitDialog()
 	// TODO:  在此添加额外的初始化
 	m_showTree.ModifyStyle(NULL, TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT);
 	HTREEITEM hTreeItemParent;
-	hTreeItemParent = m_showTree.InsertItem(_T("可控电脑信号"));
+	hTreeItemParent = m_showTree.InsertItem(_T("远程桌面控制"));
 	m_showTree.SetItemData(hTreeItemParent, 0);
-	HTREEITEM hTreeItemNodeNew = m_showTree.InsertItem(_T("虚拟电脑1"), hTreeItemParent);
+	/*HTREEITEM hTreeItemNodeNew = m_showTree.InsertItem(_T("虚拟电脑1"), hTreeItemParent);
 	m_showTree.SetItemData(hTreeItemNodeNew, (DWORD_PTR)hTreeItemNodeNew);
 	HTREEITEM hTreeItemNodeNew2 = m_showTree.InsertItem(_T("虚拟电脑2"), hTreeItemParent);
-	m_showTree.SetItemData(hTreeItemNodeNew2, (DWORD_PTR)hTreeItemNodeNew2);
+	m_showTree.SetItemData(hTreeItemNodeNew2, (DWORD_PTR)hTreeItemNodeNew2);*/
 	
 
 	//InitTreeControl(hTreeItemParent, 0);
-	hTreeItemParent = m_showTree.InsertItem(_T("不可控电脑信号"));
+	/*hTreeItemParent = m_showTree.InsertItem(_T("不可控电脑信号"));
 	m_showTree.SetItemData(hTreeItemParent, 1);
 
 	HTREEITEM hTreeItemNodeNew5 = m_showTree.InsertItem(_T("虚拟电脑5"), hTreeItemParent);
@@ -107,7 +107,7 @@ BOOL TreeListDlg::OnInitDialog()
 	m_showTree.SetItemData(hTreeItemNodeNew6, (DWORD_PTR)hTreeItemNodeNew6);
 
 	HTREEITEM hTreeItemNodeNew7 = m_showTree.InsertItem(_T("虚拟电脑7"), hTreeItemParent);
-	m_showTree.SetItemData(hTreeItemNodeNew7, (DWORD_PTR)hTreeItemNodeNew7);
+	m_showTree.SetItemData(hTreeItemNodeNew7, (DWORD_PTR)hTreeItemNodeNew7);*/
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
@@ -151,8 +151,21 @@ void TreeListDlg::OnNMDblclkTree1(NMHDR *pNMHDR, LRESULT *pResult)
 					5678, CString((iter->_Name).c_str()), 480, \
 					270, 960, 540);
 				
+			/*	TCHAR *pBuf = Tempcmd.GetBuffer(_MAX_PATH);
+				CreateProcess(_T("./GQYViewer.exe"), pBuf, NULL, NULL, false, 0, NULL, NULL, &si, &pi);*/
+
+			
+
 				TCHAR *pBuf = Tempcmd.GetBuffer(_MAX_PATH);
-				CreateProcess(_T("./GQYViewer.exe"), pBuf, NULL, NULL, false, 0, NULL, NULL, &si, &pi);
+				HWND temphwnd = CreateVncProcess(pBuf);
+
+				CWnd * pWnd = NULL;
+
+				//Sleep(1000);
+				pWnd = FromHandle(temphwnd);
+
+				//移好位置之后再发送开启加速显示消息
+				pWnd->PostMessage(WM_StartDisPMESSAGE, NULL, NULL);
 			}
 			iter++;
 		}
@@ -169,10 +182,10 @@ void TreeListDlg::UpDateTreeList()
 	m_showTree.DeleteAllItems();
 	HTREEITEM hTreeItem1;
 	HTREEITEM hTreeItem2;
-	hTreeItem1 = m_showTree.InsertItem(_T("可控电脑信号"));
+	hTreeItem1 = m_showTree.InsertItem(_T("远程桌面控制"));
 	m_showTree.SetItemData(hTreeItem1, 0);
-	hTreeItem2 = m_showTree.InsertItem(_T("不可控电脑信号"));
-	m_showTree.SetItemData(hTreeItem2, 1);
+	/*hTreeItem2 = m_showTree.InsertItem(_T("不可控电脑信号"));
+	m_showTree.SetItemData(hTreeItem2, 1);*/
 
 	::EnterCriticalSection(&g_cs);
 	auto iter = g_VhostInfo.begin();
@@ -188,8 +201,9 @@ void TreeListDlg::UpDateTreeList()
 		}
 		else
 		{
-			HTREEITEM hTreeItemNodeNew = m_showTree.InsertItem(CString(name.c_str()), hTreeItem2);
-			m_showTree.SetItemData(hTreeItemNodeNew, (DWORD_PTR)hTreeItemNodeNew);
+			/*HTREEITEM hTreeItemNodeNew = m_showTree.InsertItem(CString(name.c_str()), hTreeItem2);
+			m_showTree.SetItemData(hTreeItemNodeNew, (DWORD_PTR)hTreeItemNodeNew);*/
+			//去掉其他树
 		}
 		iter++;
 	}

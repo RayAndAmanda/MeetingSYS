@@ -81,11 +81,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\EmBeddedWindows.rc2">
-      <Filter>资源文件</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="res\EmBeddedWindows.ico">
       <Filter>资源文件</Filter>
     </Image>
@@ -98,5 +93,10 @@
     <Image Include="res\bitmap3.bmp">
       <Filter>资源文件</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\EmBeddedWindows.rc2">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -18,6 +18,7 @@ LoginDlg::LoginDlg(CWnd* pParent /*=NULL*/)
 	, m_PWisOK(false)
 	, m_TruePW(_T(""))
 	, m_destroywindow(false)
+	, m_bStealLogin(false)
 {
 
 }
@@ -32,12 +33,14 @@ void LoginDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON1, m_buttontestPW);
 	DDX_Control(pDX, IDC_STATIC_waithost, m_waithost);
 	//DDX_Control(pDX, IDC_STATIC_PictureCon, m_picture);
+	
 }
 
 
 BEGIN_MESSAGE_MAP(LoginDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &LoginDlg::OnBnClickedButton2)
 	ON_BN_CLICKED(IDC_BUTTON1, &LoginDlg::OnTestPassWD)
+	ON_BN_CLICKED(IDC_BUTTON3, &LoginDlg::OnBnClickedButton3)
 END_MESSAGE_MAP()
 
 
@@ -91,4 +94,12 @@ BOOL LoginDlg::OnInitDialog()
 	//m_picture;
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
+}
+
+
+void LoginDlg::OnBnClickedButton3()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_bStealLogin = true;
+	CDialog::OnOK();
 }
